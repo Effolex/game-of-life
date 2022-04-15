@@ -102,7 +102,8 @@ resetButton.addEventListener('click', () => {
 
 let isPlaying = false;
 let interval = 0;
-let speed = 300;
+let speed = 80;
+speedInput.value = speed;
 speedInput.addEventListener('input', () => {
   console.log('aa');
   speed = speedInput.value
