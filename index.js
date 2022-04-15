@@ -1,5 +1,12 @@
 const board = document.querySelector('.board');
 
+/*101
+p5
+
+Found by Achim Flammenkamp in August 1994.
+The name was suggested by Bill Gosper,
+noting that the phase shown below displays the period in binary.
+*/
 
 let initialState = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
