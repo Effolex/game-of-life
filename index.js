@@ -8,7 +8,7 @@ The name was suggested by Bill Gosper,
 noting that the phase shown below displays the period in binary.
 */
 
-let initialState = [
+const initialState = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -30,8 +30,10 @@ let initialState = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 ];
 
-tileWidth = 7;
-boardWidth = (tileWidth+1)*initialState[0].length;
+let currentState = initialState;
+
+tileWidth = 10;
+boardWidth = (tileWidth+1)*currentState[0].length;
 
 board.style.width = `${boardWidth}px`;
 
@@ -46,14 +48,15 @@ function populateColumn(column, columnIndex) {
 }
 
 function boardCreator() {
-  initialState.forEach((column, index) => {
+  board.innerHTML = '';
+  currentState.forEach((column, index) => {
     populateColumn(column, index);
   })
 }
 
 function isValidCoordinates(column, line) {
-  const validLine = (line > -1 && line < initialState[0].length);
-  const validColumn = (column > -1 && column < initialState.length);
+  const validLine = (line > -1 && line < currentState[0].length);
+  const validColumn = (column > -1 && column < currentState.length);
   return validLine && validColumn;
 }
 
@@ -63,13 +66,13 @@ function getNeighbours(cIndex, lIndex) {
     [0, -1], [0, 1],
     [1, -1], [1, 0], [1, 1]
   ];
-  const line = initialState[cIndex][lIndex];
+  const line = currentState[cIndex][lIndex];
   let aliveNeighbours = 0;
   let deadNeighbours = 0;
   neighbourCells.forEach(([nColumn, nLine]) => {
     const cNeighbour = cIndex+nColumn
     const lNeighbour = lIndex+nLine;
-    if (isValidCoordinates(cNeighbour, lNeighbour) && initialState[cNeighbour][lNeighbour]) {
+    if (isValidCoordinates(cNeighbour, lNeighbour) && currentState[cNeighbour][lNeighbour]) {
       return aliveNeighbours += 1;
     }
     if(line && isValidCoordinates(cNeighbour, lNeighbour)) {
@@ -83,7 +86,7 @@ function getNeighbours(cIndex, lIndex) {
 }
 
 function handleLiveConditions() {
-  const newState = initialState.map((column, cIndex) => {
+  const newState = currentState.map((column, cIndex) => {
     return column.map((cell, lIndex) => {
       const [ deadNeighbours, aliveNeighbours ] = getNeighbours(cIndex, lIndex);
 
@@ -96,12 +99,52 @@ function handleLiveConditions() {
       return 0;
     });
   });
-  initialState = newState;
-  board.innerHTML = '';
+  currentState = newState;
+  
   boardCreator();
 };
 
-//board.addEventListener('click', handleLiveConditions)
-setInterval(handleLiveConditions, 300)
+const startButton = document.getElementById('start');
+const resetButton = document.getElementById('reset');
+
+resetButton.addEventListener('click', () => {
+  currentState = initialState;
+  boardCreator();
+});
+
+let isPlaying = false;
+let interval = 0;
+function handlePlaying() {
+  if (!isPlaying) {
+    interval = setInterval(handleLiveConditions, 300);
+    isPlaying = true;
+    startButton.textContent = 'Stop';
+    return;
+  }
+  clearInterval(interval);
+  isPlaying = false;
+  startButton.textContent = 'Start';
+}
+startButton.addEventListener('click', handlePlaying);
+
+function handleCellmod({ target }) {
+  const { classList, id } = target;
+  if(!classList.contains('tile')) {
+    return;
+  }
+  const [column, line] = id.split('/');
+  const isAlive = classList.contains('alive');
+  const condition = ['dead', 'alive'];
+  classList.replace(
+    condition[+isAlive],
+    condition[+(!isAlive)]
+  )
+  console.log(column, line);
+  currentState[column][line] = +(!isAlive);
+
+    
+}
+
+board.addEventListener('click', handleCellmod)
 
 boardCreator();
