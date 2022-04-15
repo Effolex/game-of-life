@@ -1,4 +1,5 @@
 const board = document.querySelector('.board');
+const condition = ['dead', 'alive'];
 
 /*101
 p5
@@ -54,14 +55,20 @@ function getNeighbours(cIndex, lIndex) {
     if (isValidCoordinates(cNeighbour, lNeighbour) && currentState[cNeighbour][lNeighbour]) {
       return aliveNeighbours += 1;
     }
-    if(line && isValidCoordinates(cNeighbour, lNeighbour)) {
-      document.getElementById(`${cNeighbour}/${lNeighbour}`).style.background = 'green';
-
-    }
     deadNeighbours += 1
   })
 
   return [deadNeighbours, aliveNeighbours];
+}
+
+function boardUpdate() {
+  currentState.forEach((column, columIndex) => {
+    column.forEach((line, lineIndex) => {
+      const element = document.getElementById(`${columIndex}/${lineIndex}`);
+      const isAlive = element.classList.contains('alive');
+      element.classList.replace(condition[+isAlive], condition[line]);
+    });
+  })
 }
 
 function handleLiveConditions() {
@@ -80,7 +87,8 @@ function handleLiveConditions() {
   });
   currentState = newState;
   
-  boardCreator();
+  //boardCreator();
+  boardUpdate();
 };
 
 const startButton = document.getElementById('start');
@@ -120,7 +128,6 @@ function handleCellmod({ target }) {
   }
   const [column, line] = id.split('/');
   const isAlive = classList.contains('alive');
-  const condition = ['dead', 'alive'];
   classList.replace(
     condition[+isAlive],
     condition[+(!isAlive)]
