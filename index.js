@@ -7,33 +7,12 @@ Found by Achim Flammenkamp in August 1994.
 The name was suggested by Bill Gosper,
 noting that the phase shown below displays the period in binary.
 */
-
-const initialState = [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
-  [0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0],
-  [0,0,0,0,1,1,0,1,0,1,0,0,1,1,0,0,1,0,1,0,1,1,0,0,0],
-  [0,0,0,0,0,0,0,1,0,1,0,1,0,0,1,0,1,0,1,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,1,0,1,0,1,0,0,1,0,1,0,1,0,0,0,0,0,0],
-  [0,0,0,0,1,1,0,1,0,1,0,0,1,1,0,0,1,0,1,0,1,1,0,0,0],
-  [0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,1,0,0,0],
-  [0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-];
+import initialState from './grid.js';
 
 let currentState = initialState;
 
-tileWidth = 10;
-boardWidth = (tileWidth+1)*currentState[0].length;
+const tileWidth = 10;
+const boardWidth = (tileWidth+1)*currentState[0].length;
 
 board.style.width = `${boardWidth}px`;
 
@@ -106,6 +85,7 @@ function handleLiveConditions() {
 
 const startButton = document.getElementById('start');
 const resetButton = document.getElementById('reset');
+const speedInput = document.getElementById('speed');
 
 resetButton.addEventListener('click', () => {
   currentState = initialState;
@@ -114,9 +94,15 @@ resetButton.addEventListener('click', () => {
 
 let isPlaying = false;
 let interval = 0;
+let speed = 300;
+speedInput.addEventListener('input', () => {
+  console.log('aa');
+  speed = speedInput.value
+})
 function handlePlaying() {
+  
   if (!isPlaying) {
-    interval = setInterval(handleLiveConditions, 300);
+    interval = setInterval(handleLiveConditions, speed);
     isPlaying = true;
     startButton.textContent = 'Stop';
     return;
