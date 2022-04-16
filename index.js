@@ -1,21 +1,12 @@
-const board = document.querySelector('.board');
-const condition = ['dead', 'alive'];
-
-/*101
-p5
-
-Found by Achim Flammenkamp in August 1994.
-The name was suggested by Bill Gosper,
-noting that the phase shown below displays the period in binary.
-*/
 import initialState from './grid.js';
-
+const condition = ['dead', 'alive'];
 let currentState = initialState;
-
 const tileWidth = 10;
 const boardWidth = (tileWidth+1)*currentState[0].length;
-
+const board = document.querySelector('.board');
 board.style.width = `${boardWidth}px`;
+
+
 
 function populateColumn(column, columnIndex) {
   column.forEach((line, index) => {
@@ -46,11 +37,10 @@ function getNeighbours(cIndex, lIndex) {
     [0, -1], [0, 1],
     [1, -1], [1, 0], [1, 1]
   ];
-  const line = currentState[cIndex][lIndex];
   let aliveNeighbours = 0;
   let deadNeighbours = 0;
   neighbourCells.forEach(([nColumn, nLine]) => {
-    const cNeighbour = cIndex+nColumn
+    const cNeighbour = cIndex+nColumn;
     const lNeighbour = lIndex+nLine;
     if (isValidCoordinates(cNeighbour, lNeighbour) && currentState[cNeighbour][lNeighbour]) {
       return aliveNeighbours += 1;
@@ -64,18 +54,17 @@ function getNeighbours(cIndex, lIndex) {
 function boardUpdate() {
   currentState.forEach((column, columIndex) => {
     column.forEach((line, lineIndex) => {
-      const element = document.getElementById(`${columIndex}/${lineIndex}`);
-      const isAlive = element.classList.contains('alive');
-      element.classList.replace(condition[+isAlive], condition[line]);
+      const cell = document.getElementById(`${columIndex}/${lineIndex}`);
+      const isAlive = cell.classList.contains('alive');
+      cell.classList.replace(condition[+isAlive], condition[line]);
     });
   })
 }
 
-function handleLiveConditions() {
+function callNextCicle() {
   const newState = currentState.map((column, cIndex) => {
     return column.map((cell, lIndex) => {
       const [ deadNeighbours, aliveNeighbours ] = getNeighbours(cIndex, lIndex);
-
       if (aliveNeighbours === 3 && cell === 0) {
         return 1;
       }
@@ -86,14 +75,26 @@ function handleLiveConditions() {
     });
   });
   currentState = newState;
-  
-  //boardCreator();
+
   boardUpdate();
 };
 
 const startButton = document.getElementById('start');
 const resetButton = document.getElementById('reset');
 const speedInput = document.getElementById('speed');
+const saveBoard = document.getElementById('save-board');
+const loadBoard = document.getElementById('load-board');
+
+saveBoard.addEventListener('click', () => {
+  localStorage.setItem('board',JSON.stringify(currentState));
+})
+loadBoard.addEventListener('click', () => {
+  const localBoard = localStorage.getItem('board');
+  if (!localBoard) return;
+
+  currentState = JSON.parse(localBoard);
+  boardUpdate();
+})
 
 resetButton.addEventListener('click', () => {
   currentState = initialState;
@@ -110,7 +111,7 @@ speedInput.addEventListener('input', () => {
 function handlePlaying() {
   
   if (!isPlaying) {
-    interval = setInterval(handleLiveConditions, speed);
+    interval = setInterval(callNextCicle, speed);
     isPlaying = true;
     startButton.textContent = 'Stop';
     return;
